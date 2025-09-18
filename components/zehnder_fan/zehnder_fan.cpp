@@ -1,8 +1,12 @@
 #include "zehnder_fan.h"
 #include "esphome/core/log.h"
 #include "esphome/core/helpers.h"
-#include "nvs_flash.h"
-#include "nvs.h"
+# ifdef ESP32
+#  include "nvs_flash.h"
+#  include "nvs.h"
+# elif defined (8266)
+#  include <FS.h>
+# endif
 
 namespace esphome {
 namespace zehnder_fan {
@@ -524,6 +528,7 @@ void ZehnderFanComponent::handle_operation_complete() {
     this->fan_protocol_->reset_operation_state();
 }
 
+ifdef ESP32 {
 void ZehnderFanComponent::save_pairing_info(const FanPairingInfo &info) {
     nvs_handle_t nvs_handle;
     esp_err_t err = nvs_open(NVS_NAMESPACE, NVS_READWRITE, &nvs_handle);
@@ -546,6 +551,8 @@ void ZehnderFanComponent::save_pairing_info(const FanPairingInfo &info) {
 
     nvs_close(nvs_handle);
 }
+}
+endif
 
 bool ZehnderFanComponent::load_pairing_info() {
     nvs_handle_t nvs_handle;
